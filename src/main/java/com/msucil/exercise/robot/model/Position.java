@@ -51,4 +51,13 @@ public class Position {
     public int hashCode() {
         return Objects.hash(getX(), getY(), getDirection());
     }
+
+    @Override
+    public String toString() {
+        return "Position{" +
+                "x=" + x +
+                ", y=" + y +
+                ", direction=" + direction +
+                '}';
+    }
 }

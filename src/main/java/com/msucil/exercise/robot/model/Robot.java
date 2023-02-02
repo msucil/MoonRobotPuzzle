@@ -5,6 +5,10 @@ import java.util.Objects;
 public class Robot {
     private Position position;
 
+    public Robot(){
+        this.position = new Position(0, 0, Direction.E);
+    }
+
     public Robot(Position position) {
         this.position = position;
     }

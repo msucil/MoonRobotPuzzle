@@ -1,5 +1,15 @@
 package com.msucil.exercise.robot.model;
 
 public enum Direction {
-    E, W, N, S
+    E, W, N, S;
+
+    public Direction getDirection(String direction){
+        return switch (direction) {
+            case "E" -> E;
+            case "W" -> W;
+            case "N" -> N;
+            case "S" -> S;
+            default -> null;
+        };
+    }
 }

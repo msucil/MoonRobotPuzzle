@@ -10,6 +10,7 @@
     <properties>
         <java.version>17</java.version>
         <junit.version>5.9.2</junit.version>
+        <logback.classic.version>1.4.5</logback.classic.version>
         <compiler.plugin.version>3.10.1</compiler.plugin.version>
         <jacoco.plugin.version>0.8.8</jacoco.plugin.version>
         <project.testresult.directory>${project.build.directory}/test-results</project.testresult.directory>
@@ -21,6 +22,12 @@
             <artifactId>junit-jupiter-api</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.classic.version}</version>
         </dependency>
 
     </dependencies>
