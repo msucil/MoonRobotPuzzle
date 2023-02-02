@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.msucil.exercise</groupId>
+    <artifactId>robot</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>robot</name>
+    <description>Covered by SAGE : Moon Robots puzzles</description>
+    <properties>
+        <java.version>17</java.version>
+        <junit.version>5.9.2</junit.version>
+        <compiler.plugin.version>3.10.1</compiler.plugin.version>
+        <jacoco.plugin.version>0.8.8</jacoco.plugin.version>
+        <project.testresult.directory>${project.build.directory}/test-results</project.testresult.directory>
+    </properties>
+    <dependencies>
+        <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+                <version>${compiler.plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>pre-unit-tests</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Sets the path to the file which contains the execution data. -->
+                            <destFile>${project.testresult.directory}/coverage/jacoco/jacoco.exec</destFile>
+                        </configuration>
+                    </execution>
+                    <!-- Ensures that the code coverage report for unit tests is created after unit tests have been run -->
+                    <execution>
+                        <id>post-unit-test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <dataFile>${project.testresult.directory}/coverage/jacoco/jacoco.exec</dataFile>
+                            <outputDirectory>${project.testresult.directory}/coverage</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
