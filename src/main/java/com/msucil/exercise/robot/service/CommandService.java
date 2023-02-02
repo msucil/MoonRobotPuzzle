@@ -1,10 +1,10 @@
 package com.msucil.exercise.robot.service;
 
-import com.msucil.exercise.robot.model.Direction;
+import com.msucil.exercise.robot.model.Robot;
 
 public interface CommandService {
 
-    void setPosition(int x, int y, Direction direction);
+    Robot initialize(int x, int y, String direction);
 
-    String command(String command);
+    String execute(Robot robot, String command);
 }

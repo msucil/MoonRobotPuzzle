@@ -1,122 +1,79 @@
 package com.msucil.exercise.robot.service;
 
-import com.msucil.exercise.robot.model.Command;
-import com.msucil.exercise.robot.model.Direction;
-import com.msucil.exercise.robot.model.Position;
-import com.msucil.exercise.robot.model.Robot;
+import com.msucil.exercise.robot.exception.InvalidCommandException;
+import com.msucil.exercise.robot.exception.InvalidCoordinateException;
+import com.msucil.exercise.robot.exception.InvalidDirectionException;
+import com.msucil.exercise.robot.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class RobotCommandService implements CommandService {
 
     private static final Logger LOG = LoggerFactory.getLogger(RobotCommandService.class);
-    private final Robot robot;
 
-    public RobotCommandService(Robot robot) {
-        this.robot = robot;
+    private final PositionService positionService;
+    private final Surface surface;
+
+    public RobotCommandService(Surface surface, PositionService positionService) {
+        this.surface = surface;
+        this.positionService = positionService;
     }
 
     @Override
-    public void setPosition(int x, int y, Direction direction) {
-        robot.setPosition(new Position(x, y, direction));
-    }
+    public Robot initialize(int x, int y, String direction) {
+        Direction d = Direction.getDirection(direction);
 
-    @Override
-    public String command(String command) {
-        final char[] commandArray = command.toUpperCase().toCharArray();
-
-        final List<Command> commands = new ArrayList<>(commandArray.length);
-
-        for (char c : commandArray) {
-            commands.add(Command.getCommand(String.valueOf(c)));
+        if (null == d) {
+            LOG.error("Invalid direction: {}", direction);
+            throw new InvalidDirectionException("Invalid Direction " + direction);
         }
 
-        for (Command cmd : commands) {
-            final Position nextPosition = getNextPosition(cmd);
-            LOG.info("Next position: {} after execution command: {}", nextPosition, cmd);
-            robot.setPosition(nextPosition);
+        if (isInvalidCoordinate(x, y)) {
+            LOG.error("Invalid coordinate x: {}, y: {}", x, y);
+            throw new InvalidCoordinateException("Invalid coordinate x: " + x + ", y: " + y);
+        }
+        return new Robot(new Position(x, y, d));
+    }
+
+    @Override
+    public String execute(Robot robot, String commands) {
+        final char[] commandArray = commands.toUpperCase().toCharArray();
+
+        for (char c : commandArray) {
+            Command command = Command.getCommand(c);
+
+            if (null == command) {
+                LOG.error("Invalid Command: {}", c);
+                throw new InvalidCommandException("Invalid Command " + c);
+            }
+
+            switch (command) {
+                case L -> {
+                    final Position position = positionService.rotateAntiClockWise(robot.getPosition());
+                    robot.setPosition(position);
+                }
+                case R -> {
+                    final Position position = positionService.rotateClockWise(robot.getPosition());
+                    robot.setPosition(position);
+                }
+                case M -> {
+                    final Position position = positionService.moveForward(robot.getPosition());
+
+                    if (isInvalidCoordinate(position.getX(), position.getY())) {
+                        throw new InvalidCoordinateException("Invalid Coordinate x: " + position.getX() + ", " + position.getY());
+                    }
+
+                    LOG.info("Command {}, Postion {}", command, position);
+
+                    robot.setPosition(position);
+                }
+            }
         }
 
         return robot.getPosition().toString();
     }
 
-    private Position getNextPosition(Command command) {
-        switch (command) {
-            case R -> {
-                return rotateClockWise(robot.getPosition());
-            }
-            case L -> {
-                return rotateAntiClockWise(robot.getPosition());
-            }
-            case M -> {
-                return incrementCoordinate(robot.getPosition());
-            }
-            default -> {
-                return robot.getPosition();
-            }
-        }
-    }
-
-    private Position rotateClockWise(Position position) {
-        switch (position.getDirection()) {
-            case E -> {
-                return new Position(position.getX(), position.getY(), Direction.S);
-            }
-            case S -> {
-                return new Position(position.getX(), position.getY(), Direction.W);
-            }
-            case W -> {
-                return new Position(position.getX(), position.getY(), Direction.N);
-            }
-            case N -> {
-                return new Position(position.getX(), position.getY(), Direction.E);
-            }
-            default -> {
-                return position;
-            }
-        }
-    }
-
-    private Position rotateAntiClockWise(Position position) {
-        switch (position.getDirection()) {
-            case E -> {
-                return new Position(position.getX(), position.getY(), Direction.N);
-            }
-            case S -> {
-                return new Position(position.getX(), position.getY(), Direction.E);
-            }
-            case W -> {
-                return new Position(position.getX(), position.getY(), Direction.S);
-            }
-            case N -> {
-                return new Position(position.getX(), position.getY(), Direction.W);
-            }
-            default -> {
-                return position;
-            }
-        }
-    }
-
-    private Position incrementCoordinate(Position position) {
-        switch (position.getDirection()) {
-            case E -> {
-                return new Position(position.getX() + 1, position.getY(), position.getDirection());
-            }
-            case S -> {
-                return new Position(position.getX(), position.getY() - 1, position.getDirection());
-            }
-            case W -> {
-                return new Position(position.getX() - 1, position.getY(), position.getDirection());
-            }
-            case N -> {
-                return new Position(position.getX(), position.getY() + 1, position.getDirection());
-            }
-            default -> {
-                return position;
-            }
-        }
+    private boolean isInvalidCoordinate(int x, int y) {
+        return 0 < x && 0 < y && surface.getX() < x && surface.getY() < y;
     }
 }
